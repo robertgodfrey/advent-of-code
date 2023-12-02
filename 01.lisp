@@ -7,8 +7,9 @@
   (with-output-to-string (s)  ; stream to string
     (let ((index 0))
       (loop for c across line   ; for each char in the input string
-        ; check to see if the char is numeric (ascii code 48-57)  
-        do (cond ((and (> (char-code c) 47) (< (char-code c) 58)) (write-char c s)))
+        ; check to see if the char is numeric (ascii code 48-57)
+        do (cond
+             ((and (> (char-code c) 47) (< (char-code c) 58)) (write-char c s)))
            (cond ((< index (- (length line) 2))
              (cond ((string= (subseq line index (+ index 3)) "one") (write-char #\1 s)))
              (cond ((string= (subseq line index (+ index 3)) "two") (write-char #\2 s)))
@@ -29,9 +30,10 @@
 (defun first-last (str)
   "Returns the first and last char of a string"
   (with-output-to-string (s)
-    (cond ((< 0 (length str)) (write-char (char str 0) s)))  ; get first char from num string
-    (cond ((= 1 (length str)) (write-char (char str 0) s)))  ; if there is only one char, repeat
-    (cond ((< 1 (length str)) (write-char (char str (- (length str) 1)) s)))  ; otherwise, get last char
+    (cond
+      ((< 0 (length str))
+          (write-char (char str 0) s)
+          (write-char (char str (- (length str) 1)) s)))
     s))
 
 
