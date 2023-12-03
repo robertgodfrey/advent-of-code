@@ -9,6 +9,7 @@ open inFH, "< input.txt" or die "\nUnable to open file\n";
 my @input = <inFH>;
 my $sumPossibleIndices = 0;
 my $sumPowers = 0;
+my $gameNum = 1;
 
 foreach my $line (@input) {
     my $possible = 1;
@@ -16,10 +17,6 @@ foreach my $line (@input) {
     my $maxGreen = 0;
     my $maxBlue = 0;
 
-    $line =~ m/Game (\d+):/;
-    my $gameNum = $1;
-
-    # check red
     while ($line =~ m/.*?(\d+) red/g) {
         if ($1 > 12) {
             $possible = 0;
@@ -29,7 +26,6 @@ foreach my $line (@input) {
         }
     }
 
-    # check green
     while ($line =~ m/.*?(\d+) green/g) {
         if ($1 > 13) {
             $possible = 0;
@@ -39,7 +35,6 @@ foreach my $line (@input) {
         }
     }
 
-    # check blue
     while ($line =~ m/.*?(\d+) blue/g) {
         if ($1 > 14) {
             $possible = 0;
@@ -53,6 +48,7 @@ foreach my $line (@input) {
         $sumPossibleIndices += $gameNum;
     }
     $sumPowers += $maxRed * $maxGreen * $maxBlue;
+    $gameNum++;
 }
 
 close inFH;
