@@ -43,7 +43,6 @@ class Day02 {
                 if (removedLevel) {
                     return false;
                 }
-                boolean removedPreviousIsSafe = false;
                 ArrayList<Integer> removedCurrent = new ArrayList<Integer>(list);
                 ArrayList<Integer> removedNext = new ArrayList<Integer>(list);
                 removedCurrent.remove(i - 1);
@@ -51,9 +50,14 @@ class Day02 {
                 if (i > 1) {
                     ArrayList<Integer> removedPrevious = new ArrayList<Integer>(list);
                     removedPrevious.remove(i - 2);
-                    removedPreviousIsSafe = isSafe(removedPrevious, true);
+                    if (isSafe(removedPrevious, true)) {
+                        return true;
+                    }
                 }
-                return removedPreviousIsSafe || isSafe(removedCurrent, true) || isSafe(removedNext, true);
+                if (isSafe(removedCurrent, true)) {
+                    return true;
+                }
+                return isSafe(removedNext, true);
             }
         }
         return true;
