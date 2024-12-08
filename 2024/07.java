@@ -5,14 +5,15 @@
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.math.BigInteger;
+import java.time.Instant;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
 
 class Day07 {
-    private final ArrayList<ArrayList<BigInteger>> equations = new ArrayList<>();
+    private final ArrayList<ArrayList<Long>> equations = new ArrayList<>();
 
     private void getInput() {
         try {
@@ -22,9 +23,9 @@ class Day07 {
                 String line = fileReader.nextLine();
                 String[] nums = line.split(" ");
                 equations.add(new ArrayList<>());
-                equations.get(index).add(new BigInteger(line.split(":")[0]));
+                equations.get(index).add(Long.parseLong(line.split(":")[0]));
                 for (int i = 1; i < nums.length; i++) {
-                    equations.get(index).add(new BigInteger(nums[i]));
+                    equations.get(index).add(Long.parseLong(nums[i]));
                 }
                 index++;
             }
@@ -34,37 +35,40 @@ class Day07 {
         }
     }
 
-    private boolean maths(BigInteger target, BigInteger current, BigInteger[] nums, boolean concatenate) {
-        BigInteger combinedNum = new BigInteger(String.format("%d%d", current, nums[0]));
-        if (nums.length == 1) {
-            return nums[0].add(current).equals(target) || nums[0].multiply(current).equals(target)
-                    || (concatenate && combinedNum.equals(target));
+    private boolean maths(long target, long current, Long[] nums, boolean concatenate) {
+        if (current > target) {
+            return false;
         }
-        return maths(target, current.add(nums[0]), Arrays.copyOfRange(nums, 1, nums.length), concatenate)
-                || maths(target, current.multiply(nums[0]), Arrays.copyOfRange(nums, 1, nums.length), concatenate)
-                || (concatenate && maths(target, combinedNum, Arrays.copyOfRange(nums, 1, nums.length), concatenate));
+        long combinedNum = (long) (current * Math.pow(10, Math.floor(Math.log10(nums[0])) + 1)) + nums[0]; 
+        if (nums.length == 1) {
+            return nums[0] + current == target || nums[0] * current == target
+                    || (concatenate && combinedNum == target);
+        }
+        return maths(target, current + nums[0], Arrays.copyOfRange(nums, 1, nums.length), concatenate)
+                || maths(target, current * nums[0], Arrays.copyOfRange(nums, 1, nums.length), concatenate)
+                || (concatenate && maths(target, combinedNum, Arrays.copyOfRange(nums, 1, nums.length), true));
     }
 
     private void solve() {
-        BigInteger partOneSum = new BigInteger("0");
-        BigInteger partTwoSum = new BigInteger("0");
-        for (ArrayList<BigInteger> equation : equations) {
-            BigInteger[] currentList = equation.toArray(new BigInteger[0]);
+        long partOneSum = 0;
+        long partTwoSum = 0;
+        for (ArrayList<Long> equation : equations) {
+            Long[] currentList = equation.toArray(new Long[0]);
             if (maths(currentList[0], currentList[1], Arrays.copyOfRange(currentList, 2, currentList.length), false)) {
-                partOneSum = partOneSum.add(currentList[0]);
+                partOneSum += currentList[0];
             }
+            long combinedNum = (long) (currentList[1] * Math.pow(10, Math.floor(Math.log10(currentList[2])) + 1)) + currentList[2];
             if (equation.size() <= 3) {
-                if (new BigInteger(String.format("%d%d", currentList[1], currentList[2])).equals(currentList[0])) {
-                    partTwoSum = partTwoSum.add(currentList[0]);
+                if (combinedNum == currentList[0]) {
+                    partTwoSum += currentList[0];
                     continue;
                 }
-            } else if (maths(currentList[0], new BigInteger(String.format("%d%d", currentList[1], currentList[2])),
-                    Arrays.copyOfRange(currentList, 3, currentList.length), true)) {
-                partTwoSum = partTwoSum.add(currentList[0]);
+            } else if (maths(currentList[0], combinedNum, Arrays.copyOfRange(currentList, 3, currentList.length), true)) {
+                partTwoSum += currentList[0];
                 continue;
             }
             if (maths(currentList[0], currentList[1], Arrays.copyOfRange(currentList, 2, currentList.length), true)) {
-                partTwoSum = partTwoSum.add(currentList[0]);
+                partTwoSum += currentList[0];
             }
         }
         System.out.printf("Part one: %s\n", partOneSum);
@@ -72,8 +76,13 @@ class Day07 {
     }
 
     public static void main(String[] args) {
+        Instant start = Instant.now();
+
         Day07 solution = new Day07();
         solution.getInput();
         solution.solve();
+
+        System.out.println("Execution time: " + Duration.between(start, Instant.now()).toMillis() + " milliseconds");
     }
 }
+
